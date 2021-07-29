@@ -1,5 +1,7 @@
 package com.example.demo.student;
 
+import com.example.demo.student.exceptions.BadRequestException;
+import com.example.demo.student.exceptions.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +30,7 @@ public class StudentService {
         Student student = studentRepository.findStudentById(studentId);
 
         if (student == null) {
-            throw new IllegalStateException("Student of id " + studentId + " does not exists.");
+            throw new NotFoundException("Student of id " + studentId + " does not exists.");
         }
 
         return student;
@@ -38,7 +40,7 @@ public class StudentService {
         Optional<Student> studentEmail = studentRepository.findStudentByEmail(student.getEmail());
 
         if (studentEmail.isPresent()) {
-            throw new IllegalStateException("Email already exists.");
+            throw new BadRequestException("Email already exists.");
         }
 
         studentRepository.save(student);
@@ -49,20 +51,20 @@ public class StudentService {
         Student student = studentRepository.findStudentById(studentId);
 
         if (student == null) {
-            throw new IllegalStateException("Student of id " + studentId + " does not exists.");
+            throw new NotFoundException("Student of id " + studentId + " does not exists.");
         }
 
         String name = newStudentData.getName();
         String email = newStudentData.getEmail();
 
         if (!isValidEmail(student.getEmail(), email)) {
-            throw new IllegalStateException("Email already taken.");
+            throw new BadRequestException("Email already taken.");
         }
 
         student.setEmail(email);
 
         if (!isValidName(student.getName(), name)) {
-            throw new IllegalStateException("Name is not valid.");
+            throw new BadRequestException("Name is not valid.");
         }
 
         student.setName(name);
@@ -72,7 +74,7 @@ public class StudentService {
         boolean studentExists = studentRepository.existsById(studentId);
 
         if (!studentExists) {
-            throw new IllegalStateException("Student of id " + studentId + " does not exists.");
+            throw new NotFoundException("Student of id " + studentId + " does not exists.");
         }
 
         studentRepository.deleteById(studentId);
